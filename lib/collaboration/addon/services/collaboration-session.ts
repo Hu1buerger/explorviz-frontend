@@ -35,6 +35,7 @@ import {
 } from 'collaboration/utils/web-socket-messages/types/controller-id';
 import { ForwardedMessage } from 'collaboration/utils/web-socket-messages/receivable/forwarded';
 import LandscapeTokenService from 'explorviz-frontend/services/landscape-token';
+import MinimapService from 'explorviz-frontend/services/minimap-service';
 import {
   USER_KICK_EVENT,
   UserKickEvent,
@@ -80,6 +81,9 @@ export default class CollaborationSession extends Service.extend({
 
   @service('landscape-token')
   tokenService!: LandscapeTokenService;
+
+  @service('minimap-service')
+  minimapService!: MinimapService;
 
   @service('chat')
   chatService!: ChatService;
@@ -174,12 +178,12 @@ export default class CollaborationSession extends Service.extend({
     return this.idToRemoteUser.get(userId);
   }
 
-  getCssColor(userId: string) {
+  getColor(userId: string) {
     const remoteUser = this.lookupRemoteUserById(userId);
     if (!remoteUser) {
       return `#${this.localUser.color?.getHexString()}`;
     }
-    return remoteUser?.color.getStyle();
+    return `#${remoteUser?.color.getHexString()}`;
   }
 
   /**
@@ -205,9 +209,7 @@ export default class CollaborationSession extends Service.extend({
     this.localUser.connected({
       id: self.id,
       name: self.name,
-      color: new THREE.Color(
-        `rgb(${self.color.red}, ${self.color.green}, ${self.color.blue})`
-      ),
+      color: new THREE.Color(self.color.red, self.color.green, self.color.blue),
     });
 
     // Ensure same settings for all users in collaboration session
@@ -467,10 +469,16 @@ export default class CollaborationSession extends Service.extend({
   }: ForwardedMessage<UserPositionsMessage>): void {
     const remoteUser = this.lookupRemoteUserById(userId);
     if (!remoteUser) return;
-
     if (controller1) remoteUser.updateController(CONTROLLER_1_ID, controller1);
     if (controller2) remoteUser.updateController(CONTROLLER_2_ID, controller2);
-    if (camera) remoteUser.updateCamera(camera);
+    if (camera) {
+      remoteUser.updateCamera(camera);
+      this.minimapService.updateUserMinimapMarker(
+        remoteUser.camera!.model.position,
+        userId,
+        remoteUser
+      );
+    }
   }
 }
 

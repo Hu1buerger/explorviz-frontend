@@ -1,11 +1,13 @@
 export type SettingGroup =
   | 'Camera'
+  | 'Minimap'
   | 'Colors'
   | 'Controls'
   | 'Communication'
   | 'Highlighting'
   | 'Effects'
   | 'Popups'
+  | 'Annotations'
   | 'Virtual Reality'
   | 'Debugging';
 
@@ -34,14 +36,29 @@ export type ApplicationHighlightingSettingId =
 
 export type ApplicationHoveringSettingId =
   | 'enableHoverEffects'
-  | 'enableAnimations';
+  | 'enableAnimations'
+  | 'castShadows';
 
 export type ApplicationCommunicationSettingId =
   | 'commThickness'
   | 'commArrowSize'
   | 'curvyCommHeight';
 
-export type ApplicationCameraSettingId = 'useOrthographicCamera' | 'cameraFov';
+export type ApplicationMinimapSettingId =
+  | 'minimap'
+  | 'zoom'
+  | 'version2'
+  | 'layer1'
+  | 'layer2'
+  | 'layer3'
+  | 'layer4'
+  | 'layer6'
+  | 'layer7';
+
+export type ApplicationCameraSettingId =
+  | 'cameraNear'
+  | 'cameraFar'
+  | 'cameraFov';
 
 export type ApplicationXRSettingId = 'showVrButton' | 'showVrOnClick';
 
@@ -53,7 +70,9 @@ export type ApplicationDebugSettingId =
   | 'syncRoomState'
   | 'resetToDefaults';
 
-export type ApplicationPopupSettingId = 'enableCustomPopupPosition';
+export type ApplicationPopupSettingId = 'hidePopupDelay';
+
+export type ApplicationAnnotationSettingId = 'enableCustomAnnotationPosition';
 
 export type ApplicationSettingId =
   | ApplicationColorSettingId
@@ -64,17 +83,19 @@ export type ApplicationSettingId =
   | ApplicationDebugSettingId
   | ApplicationCameraSettingId
   | ApplicationXRSettingId
-  | ApplicationPopupSettingId;
-
-export type ApplicationControlSettings = {
-  enableGamepadControls: FlagSetting;
-  selectedGamepadIndex: RangeSetting;
-};
+  | ApplicationPopupSettingId
+  | ApplicationMinimapSettingId
+  | ApplicationAnnotationSettingId;
 
 export type ApplicationColorSettings = Record<
   ApplicationColorSettingId,
   ColorSetting
 >;
+
+export type ApplicationControlSettings = {
+  enableGamepadControls: FlagSetting;
+  selectedGamepadIndex: RangeSetting;
+};
 
 export type ApplicationHighlightingSettings = {
   applyHighlightingOnHover: FlagSetting;
@@ -103,14 +124,31 @@ export type ApplicationDebugSettings = {
   resetToDefaults: ButtonSetting;
 };
 
-export type ApplicationPopupSettings = Record<
-  ApplicationPopupSettingId,
+export type ApplicationPopupSettings = {
+  hidePopupDelay: RangeSetting;
+};
+
+export type ApplicationAnnotationSettings = Record<
+  ApplicationAnnotationSettingId,
   FlagSetting
 >;
 
 export type ApplicationCameraSettings = {
-  useOrthographicCamera: FlagSetting;
+  cameraNear: RangeSetting;
+  cameraFar: RangeSetting;
   cameraFov: RangeSetting;
+};
+
+export type ApplicationMinimapSettings = {
+  minimap: FlagSetting;
+  zoom: RangeSetting;
+  version2: FlagSetting;
+  layer1: FlagSetting;
+  layer2: FlagSetting;
+  layer3: FlagSetting;
+  layer4: FlagSetting;
+  layer6: FlagSetting;
+  layer7: FlagSetting;
 };
 
 export type ApplicationXRSettings = Record<ApplicationXRSettingId, FlagSetting>;
@@ -121,9 +159,11 @@ export type ApplicationSettings = ApplicationColorSettings &
   ApplicationHoveringSettings &
   ApplicationDebugSettings &
   ApplicationPopupSettings &
+  ApplicationAnnotationSettings &
   ApplicationCameraSettings &
   ApplicationXRSettings &
-  ApplicationCommunicationSettings;
+  ApplicationCommunicationSettings &
+  ApplicationMinimapSettings;
 
 export interface Setting<T> {
   value: T;
